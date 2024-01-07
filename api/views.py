@@ -95,8 +95,8 @@ def get_tech_docx_view(request):
     if request.method == "POST":
         # print(request.POST)
         project_number = request.POST.get('project_number')
-
-        project = ProjectList.objects.filter(project_number=project_number).first()
+        project_name = request.POST.get('project_name')
+        project = ProjectList.objects.filter(project_number=project_number, project_name=project_name).first()
         if project:
             docx_path = f"{project.project_link}"
             docx_info = get_docx_info(docx_path)
