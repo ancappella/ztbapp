@@ -27,7 +27,7 @@ class BidInfo(models.Model):
 class ProjectList(models.Model):
     id = models.AutoField(primary_key=True)
     project_number = models.CharField("项目编号", max_length=255, unique=True)
-    project_name = models.TextField("项目名称", max_length=255, unique=True)
+    project_name = models.TextField("项目名称")
     project_link = models.TextField("项目链接")
     create_date = models.DateTimeField("日期", auto_now=True)
 
