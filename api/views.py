@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.forms import model_to_dict
@@ -13,6 +15,7 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from api.models import BidInfo, ProjectList
 
 from shibing624.shibing624 import get_project
+
 
 # from shibing624.add_data import add, data
 # add(data)
@@ -121,8 +124,10 @@ def get_add_info_p_view(request):
     # if request.method == "GET":
     if request.method == "POST":
         # print(request.POST)
-        add_info_p = request.POST.get('add_info_p')
-        json_data = json.loads(add_info_p)
+        title = request.POST.get('title')
+        context = request.POST.get('context')
+        input_info_p = request.POST.get('input_info_p')
+        # json_data = json.loads(add_info_p)
 
         # json_data = {'title': '案件资料', 'context': '根据比选文件的要求，结合本项目的特点，从项目实施组织及部署的科学性；宣传氛围布置工序安排的合理性；具体布置方法选用的技术性、经济性和实现的可能性进行了科学的论断和详细的阐述。", "针对一些技术难点提出了解决问题的方法。对关键工序进行了合理的编排。', 'input_info_p': '对工期、质量、安全、文明宣传布置提出了工作目标，并针对各项目建立了保证体系，制定了相应的技术保证措施。", "从采购单位利益及项目顺利进行的角度上考虑制定了与采购单位等其他合作单位的配合措施。'}
 
@@ -130,20 +135,22 @@ def get_add_info_p_view(request):
 
         # 添加标题
         title_paragraph = doc.add_paragraph()
-        title_run = title_paragraph.add_run(json_data['title'])
+        title_run = title_paragraph.add_run(title)
         title_run.bold = True  # 设置标题为粗体
         title_run.font.size = Pt(16)  # 设置标题字体大小
         title_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER  # 设置标题居中
 
-        doc.add_paragraph(json_data['context'])
+        doc.add_paragraph(context)
         doc.add_paragraph("")
-        doc.add_paragraph(json_data['input_info_p'])
+        doc.add_paragraph(input_info_p)
 
-        doc.save(f"media/project_list_add/{time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())}_{uuid.uuid4().hex}.docx")
+        doc.save(
+            f"media/project_list_add/{time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())}_{uuid.uuid4().hex}.docx")
 
         code = 1
         msg = "ok"
-        data = dict(code=code, msg=msg, file_path=f"media/project_list_add/{time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())}_{uuid.uuid4().hex}.docx")
+        data = dict(code=code, msg=msg,
+                    file_path=f"media/project_list_add/{time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())}_{uuid.uuid4().hex}.docx")
         return JsonResponse(data, json_dumps_params={'ensure_ascii': False})
 
 
@@ -169,7 +176,9 @@ def record_post(request):
         # os.makedirs(save_directory, exist_ok=True)  # 创建目录
 
         if record_file:
-            file_name = save_file_data(record_file, f"{time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())}_{uuid.uuid4().hex}", save_directory)
+            file_name = save_file_data(record_file,
+                                       f"{time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())}_{uuid.uuid4().hex}",
+                                       save_directory)
         else:
             file_name = "null"
 
@@ -177,5 +186,3 @@ def record_post(request):
         msg = "ok"
         data = dict(code=code, msg=msg, file_path=f"media/record_file/{file_name}")
         return JsonResponse(data, json_dumps_params={'ensure_ascii': False})
-
-
